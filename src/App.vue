@@ -28,4 +28,8 @@ html,
 body {
   height: 100%;
 }
+
+.bottom-0 {
+  bottom: 0;
+}
 </style>

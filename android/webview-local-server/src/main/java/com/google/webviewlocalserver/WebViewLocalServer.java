@@ -16,7 +16,6 @@ limitations under the License.
 package com.google.webviewlocalserver;
 
 import android.content.Context;
-import android.graphics.Path;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
@@ -170,10 +169,14 @@ public class WebViewLocalServer {
         }
     }
 
-    /*package*/ WebViewLocalServer(AndroidProtocolHandler protocolHandler) {
+    /*package*/ WebViewLocalServer(AndroidProtocolHandler protocolHandler, String subdomain) {
         uriMatcher = new UriMatcher(null);
         this.protocolHandler = protocolHandler;
-        authority = UUID.randomUUID().toString() + "." + knownUnusedAuthority;
+        authority = subdomain + "." + knownUnusedAuthority;
+    }
+
+    /*package*/ WebViewLocalServer(AndroidProtocolHandler protocolHandler) {
+        this(protocolHandler, UUID.randomUUID().toString());
     }
 
     /**
@@ -184,7 +187,11 @@ public class WebViewLocalServer {
     public WebViewLocalServer(Context context) {
         // We only need the context to resolve assets and resources so the ApplicationContext is
         // sufficient while holding on to an Activity context could cause leaks.
-        this(new AndroidProtocolHandler(context.getApplicationContext()));
+        this(new AndroidProtocolHandler(context.getApplicationContext()), UUID.randomUUID().toString());
+    }
+
+    public WebViewLocalServer(Context context, String subdomain) {
+        this(new AndroidProtocolHandler(context.getApplicationContext()), subdomain);
     }
 
     private static Uri parseAndVerifyUrl(String url) {

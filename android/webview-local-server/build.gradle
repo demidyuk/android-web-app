@@ -3,6 +3,10 @@ apply plugin: 'com.android.library'
 android {
     compileSdkVersion 28
 
+    useLibrary 'android.test.runner'
+    useLibrary 'android.test.base'
+    useLibrary 'android.test.mock'
+
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 28

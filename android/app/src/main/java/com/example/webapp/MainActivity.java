@@ -3,6 +3,7 @@ package com.example.webapp;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -12,15 +13,20 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.example.webapp.util.Proxy;
 import com.google.webviewlocalserver.WebViewLocalServer;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 public class MainActivity extends Activity {
 
     private WebView mWebView;
     private WebViewLocalServer assetServer;
     private Proxy proxy;
+    private SharedPreferences sPref;
+
+    private final static String SUBDOMAIN = "SUBDOMAIN";
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -35,10 +41,11 @@ public class MainActivity extends Activity {
         webSettings.setJavaScriptEnabled(true);
         webSettings.setAllowFileAccessFromFileURLs(false);
         webSettings.setAllowUniversalAccessFromFileURLs(false);
+        webSettings.setDomStorageEnabled(true);
 
         mWebView.addJavascriptInterface(new WebAppInterface(this), "__ANDROID__");
 
-        assetServer = new WebViewLocalServer(getApplicationContext());
+        assetServer = new WebViewLocalServer(this, getSubdomain());
         WebViewLocalServer.AssetHostingDetails details =
                 assetServer.hostAssets("www");
 
@@ -51,7 +58,6 @@ public class MainActivity extends Activity {
                 }});
 
         mWebView.setWebViewClient(new WebClient());
-
         mWebView.loadUrl(proxy.root());
     }
 
@@ -62,6 +68,27 @@ public class MainActivity extends Activity {
         } else {
             super.onBackPressed();
         }
+    }
+
+    private String getSubdomain() {
+        String subdomain = loadSubdomain();
+        if (subdomain == null) {
+            subdomain = UUID.randomUUID().toString();
+            saveSubdomain(subdomain);
+        }
+        return subdomain;
+    }
+
+    private void saveSubdomain(String subdomain) {
+        sPref = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor ed = sPref.edit();
+        ed.putString(SUBDOMAIN, subdomain);
+        ed.apply();
+    }
+
+    private String loadSubdomain() {
+        sPref = getPreferences(MODE_PRIVATE);
+        return sPref.getString(SUBDOMAIN, null);
     }
 
     class WebClient extends WebViewClient {
