@@ -1,0 +1,25 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 28
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 28
+        versionCode 1
+        versionName "0.1"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+    sourceSets {
+        main {
+            java.srcDirs = [
+                    'src/main/java',
+                    'src/main/third_party/android/java',
+                    'src/main/third_party/chromium/java']
+        }
+    }
+}
